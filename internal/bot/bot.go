@@ -151,13 +151,15 @@ func (b *Bot) Run(ctx context.Context, firstRun bool, runs []run.Run) error {
 
 				_, healingPotsFound := b.ctx.Data.Inventory.Belt.GetFirstPotion(data.HealingPotion)
 				_, manaPotsFound := b.ctx.Data.Inventory.Belt.GetFirstPotion(data.ManaPotion)
+				shouldBuyArrowsOrBolts := action.RestockArrowsOrBoltsRequired()
 
 				// Check if we need to go back to town (no pots or merc died)
-				if (b.ctx.CharacterCfg.BackToTown.NoHpPotions && !healingPotsFound ||
-					b.ctx.CharacterCfg.BackToTown.EquipmentBroken && action.RepairRequired() ||
-					b.ctx.CharacterCfg.BackToTown.NoMpPotions && !manaPotsFound ||
-					b.ctx.CharacterCfg.BackToTown.MercDied && b.ctx.Data.MercHPPercent() <= 0 && b.ctx.CharacterCfg.Character.UseMerc) &&
-					!b.ctx.Data.PlayerUnit.Area.IsTown() {
+				if shouldBuyArrowsOrBolts ||
+					(b.ctx.CharacterCfg.BackToTown.NoHpPotions && !healingPotsFound) ||
+					(b.ctx.CharacterCfg.BackToTown.EquipmentBroken && action.RepairRequired()) ||
+					(b.ctx.CharacterCfg.BackToTown.NoMpPotions && !manaPotsFound) ||
+					(b.ctx.CharacterCfg.BackToTown.MercDied && b.ctx.Data.MercHPPercent() <= 0 && b.ctx.CharacterCfg.Character.UseMerc) &&
+						!b.ctx.Data.PlayerUnit.Area.IsTown() {
 
 					// Log the exact reason for going back to town
 					var reason string
@@ -169,13 +171,24 @@ func (b *Bot) Run(ctx context.Context, firstRun bool, runs []run.Run) error {
 						reason = "No mana potions found"
 					} else if b.ctx.CharacterCfg.BackToTown.MercDied && b.ctx.Data.MercHPPercent() <= 0 && b.ctx.CharacterCfg.Character.UseMerc {
 						reason = "Mercenary is dead"
+					} else if shouldBuyArrowsOrBolts {
+						reason = "Need to restock arrows or bolts"
 					}
 
 					b.ctx.Logger.Info("Going back to town", "reason", reason)
 
 					if err = action.InRunReturnTownRoutine(); err != nil {
 						b.ctx.Logger.Warn("Failed returning town.. will try again shortly", "error", err)
-						time.Sleep(500 * time.Millisecond)
+							time.Sleep(500 * time.Millisecond)
+							continue
+						}
+						lastError = nil
+						break
+					}
+
+					// If we still failed after retries, log it but continue running
+					if lastError != nil {
+						b.ctx.Logger.Error("Failed to return to town after all retries", "error", lastError)
 					}
 				}
 				b.ctx.SwitchPriority(botCtx.PriorityNormal)

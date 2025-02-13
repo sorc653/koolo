@@ -110,6 +110,25 @@
                     </fieldset>
                 </div>
 
+                <div class="bowazon-options" style="display: none;">
+                    <fieldset class="grid">
+                        <label>
+                            AOE Skill
+                            <select name="aoeSkill">
+                                <option value="multishot" {{ if eq .Config.Character.Bowazon.AoeSkill "multishot" }}selected{{ end }}>Multi Shot</option>
+                                <option value="explodingarrow" {{ if eq .Config.Character.Bowazon.AoeSkill "explodingarrow" }}selected{{ end }}>Exploding Arrow</option>
+                            </select>
+                        </label>
+                        <label>
+                            Ammo
+                            <select name="ammo">
+                                <option value="Arrows" {{ if eq .Config.Character.Bowazon.Ammo "Arrows" }}selected{{ end }}>Arrows</option>
+                                <option value="Bolts" {{ if eq .Config.Character.Bowazon.Ammo "Bolts" }}selected{{ end }}>Bolts</option>
+                            </select>
+                        </label>
+                    </fieldset>
+                </div>
+
                 <div class="nova-sorceress-options" style="display: none;">
                     <fieldset class="grid">
                         <label>

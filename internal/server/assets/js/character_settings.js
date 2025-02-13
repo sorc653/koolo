@@ -116,6 +116,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const schedulerSettings = document.getElementById('scheduler-settings');
     const characterClassSelect = document.querySelector('select[name="characterClass"]');
     const berserkerBarbOptions = document.querySelector('.berserker-barb-options');
+    const bowazonOptions = document.querySelector('.bowazon-options');
     const novaSorceressOptions = document.querySelector('.nova-sorceress-options');
     const bossStaticThresholdInput = document.getElementById('novaBossStaticThreshold');
     const mosaicAssassinOptions = document.querySelector('.mosaic-assassin-options');
@@ -132,10 +133,12 @@ document.addEventListener('DOMContentLoaded', function () {
         const selectedClass = characterClassSelect.value;
         const noSettingsMessage = document.getElementById('no-settings-message');
         const berserkerBarbOptions = document.querySelector('.berserker-barb-options');
+        const bowazonOptions = document.querySelector('.bowazon-options');
         const novaSorceressOptions = document.querySelector('.nova-sorceress-options');
         const mosaicAssassinOptions = document.querySelector('.mosaic-assassin-options');
         // Hide all options first
         berserkerBarbOptions.style.display = 'none';
+        bowazonOptions.style.display = 'none';
         novaSorceressOptions.style.display = 'none';
         mosaicAssassinOptions.style.display = 'none';
         noSettingsMessage.style.display = 'none';
@@ -143,6 +146,8 @@ document.addEventListener('DOMContentLoaded', function () {
         // Show relevant options based on class
         if (selectedClass === 'berserker') {
             berserkerBarbOptions.style.display = 'block';
+        } else if (selectedClass === 'bowazon') {
+            bowazonOptions.style.display = 'block';
         } else if (selectedClass === 'nova' || selectedClass === 'lightsorc') {
             novaSorceressOptions.style.display = 'block';
             updateNovaSorceressOptions();

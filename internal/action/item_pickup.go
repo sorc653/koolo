@@ -251,6 +251,27 @@ func shouldBePickedUp(i data.Item) bool {
 		return true
 	}
 
+	ammoNeeded := ctx.CharacterCfg.Character.Bowazon.Ammo
+	if ammoNeeded != "" && string(i.Name) == ammoNeeded {
+		quantityOnGround := 0
+		st, statFound := i.FindStat(stat.Quantity, 0)
+		if statFound {
+			quantityOnGround = st.Value
+		}
+
+		quantityInInventory := 0
+		for _, item := range ctx.Data.Inventory.AllItems {
+			if string(item.Name) == ammoNeeded {
+				qty, _ := item.FindStat(stat.Quantity, 0)
+				quantityInInventory += qty.Value
+			}
+		}
+
+		if quantityOnGround+quantityInInventory <= 500 {
+			return true
+		}
+	}
+
 	// Pick up quest items if we're in leveling or questing run
 	specialRuns := slices.Contains(ctx.CharacterCfg.Game.Runs, "quests") || slices.Contains(ctx.CharacterCfg.Game.Runs, "leveling")
 	if specialRuns {

@@ -799,6 +799,11 @@ func (s *HttpServer) characterSettings(w http.ResponseWriter, r *http.Request) {
 			cfg.Character.BerserkerBarb.FindItemSwitch = r.Form.Has("characterFindItemSwitch")
 		}
 
+		if cfg.Character.Class == "bowazon" {
+			cfg.Character.Bowazon.AoeSkill = r.Form.Get("aoeSkill")
+			cfg.Character.Bowazon.Ammo = r.Form.Get("ammo")
+		}
+
 		// Nova Sorceress specific options
 		if cfg.Character.Class == "nova" || cfg.Character.Class == "lightsorc" {
 			bossStaticThreshold, err := strconv.Atoi(r.Form.Get("novaBossStaticThreshold"))

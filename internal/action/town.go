@@ -107,7 +107,8 @@ func InRunReturnTownRoutine() error {
 	ReviveMerc()
 	HireMerc()
 	Repair()
-	
+        RestockArrowsOrBolts()
+
 	if (ctx.CharacterCfg.Companion.Leader) {
 		UsePortalInTown()
 		utils.Sleep(500)

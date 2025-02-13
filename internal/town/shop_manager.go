@@ -13,6 +13,50 @@ import (
 	"github.com/hectorgimenez/koolo/internal/ui"
 )
 
+
+func BuyTPs() {
+	ctx := context.Get()
+
+	if _, found := ctx.Data.Inventory.Find(item.TomeOfTownPortal, item.LocationInventory); !found {
+		ctx.Logger.Info("TP Tome not found, buying one...")
+		if itm, itmFound := ctx.Data.Inventory.Find(item.TomeOfTownPortal, item.LocationVendor); itmFound {
+			BuyItem(itm, 1)
+		}
+	}
+	ctx.Logger.Debug("Filling TP Tome...")
+	if itm, found := ctx.Data.Inventory.Find(item.ScrollOfTownPortal, item.LocationVendor); found {
+		BuyFullStack(itm)
+	}
+}
+
+func BuyIDs() {
+	ctx := context.Get()
+
+	if _, found := ctx.Data.Inventory.Find(item.TomeOfIdentify, item.LocationInventory); !found {
+		ctx.Logger.Info("ID Tome not found, buying one...")
+		if itm, itmFound := ctx.Data.Inventory.Find(item.TomeOfIdentify, item.LocationVendor); itmFound {
+			BuyItem(itm, 1)
+		}
+	}
+	ctx.Logger.Debug("Filling IDs Tome...")
+	if itm, found := ctx.Data.Inventory.Find(item.ScrollOfIdentify, item.LocationVendor); found {
+		BuyFullStack(itm)
+	}
+}
+
+func BuyArrows() {
+	ctx := context.Get()
+
+	ctx.Logger.Debug("Attempting to buy arrows...")
+
+	arrows, found := findFirstMatch("arrows")
+	if found {
+		ctx.Logger.Debug("Buying arrows...")
+
+		BuyItem(arrows, 1)
+	}
+}
+
 func BuyConsumables(forceRefill bool) {
 	ctx := context.Get()
 
@@ -39,29 +83,11 @@ func BuyConsumables(forceRefill bool) {
 	}
 
 	if ShouldBuyTPs() || forceRefill {
-		if _, found := ctx.Data.Inventory.Find(item.TomeOfTownPortal, item.LocationInventory); !found {
-			ctx.Logger.Info("TP Tome not found, buying one...")
-			if itm, itmFound := ctx.Data.Inventory.Find(item.TomeOfTownPortal, item.LocationVendor); itmFound {
-				BuyItem(itm, 1)
-			}
-		}
-		ctx.Logger.Debug("Filling TP Tome...")
-		if itm, found := ctx.Data.Inventory.Find(item.ScrollOfTownPortal, item.LocationVendor); found {
-			buyFullStack(itm)
-		}
+		BuyTPs()
 	}
 
 	if ShouldBuyIDs() || forceRefill {
-		if _, found := ctx.Data.Inventory.Find(item.TomeOfIdentify, item.LocationInventory); !found {
-			ctx.Logger.Info("ID Tome not found, buying one...")
-			if itm, itmFound := ctx.Data.Inventory.Find(item.TomeOfIdentify, item.LocationVendor); itmFound {
-				BuyItem(itm, 1)
-			}
-		}
-		ctx.Logger.Debug("Filling IDs Tome...")
-		if itm, found := ctx.Data.Inventory.Find(item.ScrollOfIdentify, item.LocationVendor); found {
-			buyFullStack(itm)
-		}
+		BuyIDs()
 	}
 
 	keyQuantity, shouldBuyKeys := ShouldBuyKeys()
@@ -71,7 +97,7 @@ func BuyConsumables(forceRefill bool) {
 
 			qty, _ := itm.FindStat(stat.Quantity, 0)
 			if (qty.Value + keyQuantity) <= 12 {
-				buyFullStack(itm)
+				BuyFullStack(itm)
 			}
 		}
 	}
@@ -154,7 +180,7 @@ func BuyItem(i data.Item, quantity int) {
 	}
 }
 
-func buyFullStack(i data.Item) {
+func BuyFullStack(i data.Item) {
 	screenPos := ui.GetScreenCoordsForItem(i)
 
 	context.Get().HID.ClickWithModifier(game.RightButton, screenPos.X, screenPos.Y, game.ShiftKey)
